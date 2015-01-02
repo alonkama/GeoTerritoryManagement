@@ -1,0 +1,76 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false"
+           standardController="Territory2" extensions="GeoMapController">
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script>        
+        // First, create an object containing LatLng and population for each city.
+        var citymap = {};
+    <apex:repeat value="{!assignedAccounts}" var="acct" id="theRepeat">
+        citymap['{!acct.Name}'] = {
+            center: new google.maps.LatLng({!acct.Location__Latitude__s}, {!acct.Location__Longitude__s}),
+            annualRevenue: {!acct.AnnualRevenue},
+        	name: '{!acct.Name}<br/>{!acct.BillingCity}, {!acct.BillingState}'
+    	};
+
+    </apex:repeat>
+    var cityCircle;
+    var InfoWindow;
+    
+    function initialize() {
+        // Create the map.
+        var mapOptions = {
+            zoom: 4,
+            center: new google.maps.LatLng(37.09024, -95.712891),
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            panControl: false,
+            streetViewControl: false,
+			zoomControl: true,
+    		zoomControlOptions: {
+             	style: google.maps.ZoomControlStyle.SMALL
+            }        
+        };
+        
+        var map = new google.maps.Map(document.getElementById('map-canvas'),
+                                      mapOptions);
+        
+        var infoWindow = new google.maps.InfoWindow({ content: 'Hello', position: map.getCenter()});
+        //infoWindow.open(map);
+        
+        // Construct the circle for each value in citymap.
+        // Note: We scale the area of the circle based on the revenue.
+        for (var city in citymap) {
+            var revenueOptions = {
+                id:citymap[city].name,
+                strokeColor: '#000000',
+                strokeOpacity: 0.6,
+                strokeWeight: 1,
+                fillColor: '#00FF00',
+                fillOpacity: 0.25,
+                clickable: true,
+                map: map,
+                center: citymap[city].center,
+                radius: Math.sqrt(citymap[city].annualRevenue) * 100
+            };
+            // Add the circle for this city to the map.
+            cityCircle = new google.maps.Circle(revenueOptions);
+            google.maps.event.addListener(cityCircle, 'click', (function(cityCircle, content) {
+                return function() {
+                    infoWindow.setContent(content);
+                    infoWindow.setPosition(cityCircle.getCenter());
+                    infoWindow.open(map);
+                }
+            })(cityCircle, citymap[city].name));
+        }
+    }
+    
+    google.maps.event.addDomListener(window, 'load', initialize);
+    
+    </script>
+    <style>
+        html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+        }
+    </style>
+    <div id="map-canvas"></div>
+</apex:page>

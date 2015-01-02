@@ -1,0 +1,28 @@
+<apex:page standardController="Territory2" extensions="CountryStateController">
+    <apex:form >
+        <apex:pageBlock title="Location" mode="edit">
+            <apex:pageBlockSection columns="1">
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Country Name"/>
+                    <apex:selectList size="1" value="{!country}" id="country">
+                        <apex:selectoptions value="{!countryOptions}"/>
+                        <apex:actionSupport event="onchange" reRender="states"/>
+                    </apex:selectList>
+                </apex:pageblockSectionItem>
+                
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="State / Province"/>
+                    <apex:selectList size="10" value="{!states}" multiselect="true" id="states">
+                        <apex:selectoptions value="{!stateOptions}"/>
+                        <apex:actionSupport event="onchange" reRender="regions"/>
+                    </apex:selectList>
+                </apex:pageblockSectionItem>            
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons id="pageBlockButtons">
+                <apex:commandButton value="Save" action="{!save}"/>
+            </apex:pageBlockButtons>
+            
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>
