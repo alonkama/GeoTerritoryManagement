@@ -385,12 +385,12 @@ public class CountryStateController {
 
         if (items.size() == 1) {
             item = new ObjectTerritory2AssignmentRuleItem();
+            item.RuleId = rule.Id;
             items.add(item);
         }
         else 
             item = items.get(1);
 
-        item.RuleId = rule.Id;
         item.Field = 'Account.BillingState';
         item.Operation = 'equals';
         item.Value = getSingleString(states);
